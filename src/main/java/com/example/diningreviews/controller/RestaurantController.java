@@ -2,9 +2,9 @@ package com.example.diningreviews.controller;
 
 import com.example.diningreviews.model.Restaurant;
 import com.example.diningreviews.repository.RestaurantRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.regex.Pattern;
 
@@ -22,4 +22,19 @@ public class RestaurantController {
     public Iterable<Restaurant> getRestaurants() {
         return restaurantRepository.findAll();
     }
+
+    @PostMapping
+    public Restaurant addRestaurant(@RequestBody Restaurant restaurant) {
+        if(restaurantRepository.findByNameAndZipCode(restaurant.getName(), restaurant.geetZipCode()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        };
+        return restaurantRepository.save(restaurant);
+    }
+
+    @GetMapping("/search")
+    public Iterable<Restaurant> searchRestaurants(@RequestParam String zipCode, @RequestParam String allergy) {
+
+    }
+    // fetch restaurants that match a given zip code and that also have at least one user-submitted score
+    // for a given allergy. I want to see them sorted in descending order.
 }
